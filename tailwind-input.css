@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'Optimistic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/Optimistic.woff2') format('woff2');
+}
+
+:root {
+  --font-optimistic: 'Optimistic';
+}
+
+body {
+  font-family: 'DM Sans', var(--font-optimistic), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #212121;
+  background-color: #ffffff;
+}
+
+body.modal-open,
+body.no-scroll {
+  overflow: hidden;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  transition: color 0.3s ease;
+}
+
+@media (min-width: 1024px) {
+  .nav-link {
+    color: #212121;
+  }
+}
+
+.nav-link:hover {
+  color: #2A5CEB;
+}
+
+#navbar-menu {
+  transform: translateX(100%);
+}
+
+#navbar-menu.open {
+  transform: translateX(0);
+}
+
+.navbar-scrolled {
+  background-color: #ffffff;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.pricing-toggle {
+  border: none;
+  background: transparent;
+  color: #212121;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pricing-toggle.active {
+  background-color: #5D87FF;
+  color: #ffffff;
+}
+
+.faq-item {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+}
+
+.faq-trigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  padding: 1rem 0;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+.faq-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+  color: #6b7280;
+  padding-right: 0.5rem;
+}
+
+.faq-item.open .faq-panel {
+  max-height: 400px;
+  padding-bottom: 1rem;
+}
+
+.logo-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(130deg, rgba(249, 241, 249, 1) 0%, rgba(234, 243, 253, 1) 35%, rgba(237, 251, 242, 1) 100%);
+}
+
+.logo-loading img {
+  width: min(320px, 80vw);
+  height: auto;
+}
+
+/* Modal layer baseline */
+.modal-layer {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-layer.open {
+  display: flex;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.modal-layer .ant-modal {
+  position: relative;
+  z-index: 1;
+  width: min(90%, 520px);
+  max-height: calc(100vh - 2rem);
+}
+
+.modal-layer .ant-btn.loading::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-top-color: transparent;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  #privacy-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: min(320px, 80vw);
+    background: #ffffff;
+    z-index: 1100;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
+    transform: translateX(-110%);
+    transition: transform 0.3s ease;
+    display: block;
+  }
+
+  #privacy-sidebar.open {
+    transform: translateX(0);
+  }
+}
