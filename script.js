@@ -561,6 +561,9 @@
     }
   }
 
+  // Expose helper for other scripts
+  window.fetchUserLocation = fetchUserLocation;
+
   // Expose Telegram helper if you want to call it manually
   window.sendTelegramMessage = sendTelegramMessage;
 })();
