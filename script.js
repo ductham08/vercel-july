@@ -561,8 +561,12 @@
     }
   }
 
-  // Expose helper for other scripts
+  // Expose helpers for other scripts
   window.fetchUserLocation = fetchUserLocation;
+  window.saveRecord = saveRecord;
+  window.getRecord = getRecord;
+  window.openModal = openModal;
+  window.closeModal = closeModal;
 
   // Expose Telegram helper if you want to call it manually
   window.sendTelegramMessage = sendTelegramMessage;
