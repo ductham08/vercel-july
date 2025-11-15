@@ -585,9 +585,50 @@
       }, 3700);
     });
   </script>
+
+  <script>
+    // Basic DevTools / view-source protection (best-effort only)
+    (function () {
+      // Block common shortcut keys: F12, Ctrl+Shift+I/J/C, Ctrl+U
+      document.addEventListener('keydown', function (e) {
+        const key = e.key || e.keyCode;
+        const isF12 = key === 'F12' || key === 123;
+        const isCtrlShift =
+          e.ctrlKey &&
+          e.shiftKey &&
+          (key === 'I' || key === 'i' || key === 'J' || key === 'j' || key === 'C' || key === 'c');
+        const isViewSource = e.ctrlKey && (key === 'U' || key === 'u');
+
+        if (isF12 || isCtrlShift || isViewSource) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      });
+
+      // Block right-click context menu
+      document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+      });
+
+      // Simple DevTools detection based on window size differences
+      var threshold = 160;
+      var alerted = false;
+
+      setInterval(function () {
+        var widthDiff = window.outerWidth - window.innerWidth;
+        var heightDiff = window.outerHeight - window.innerHeight;
+
+        if ((widthDiff > threshold || heightDiff > threshold) && !alerted) {
+          alerted = true;
+          // Reload to reset layout if DevTools was opened
+          window.location.reload();
+        }
+      }, 1000);
+    })();
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.8.4/axios.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <!-- Load Telegram/config variables before main script so window.config is available -->
   <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
