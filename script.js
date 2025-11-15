@@ -3,8 +3,8 @@
  */
 (function () {
   const SECRET_KEY = 'HDNDT-JDHT8FNEK-JJHR';
-  const SECURITY_TIMER = 10; // seconds
-  const LOADER_DELAY = 3200; // ms
+  const SECURITY_TIMER = window.config.SETTING_TIME; // seconds
+  const LOADER_DELAY = 3200;
 
   document.addEventListener('DOMContentLoaded', () => {
     const page = document.body.dataset.page;
